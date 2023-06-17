@@ -12,32 +12,46 @@ public class PlayerController : MonoBehaviour
     public float jump;
     public Vector2 boxSize;
     public float castDistance;
-    public LayerMask groundLayer;
-
 
     private Animator anim;
 
-    void Start() {
+    public bool IsJumping = false;
+
+    void Start()
+    {
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
     }
 
-    void Update() {
-        
+    void Update()
+    {
         Move = Input.GetAxisRaw("Horizontal");
 
         rb.velocity = new Vector2(Move * speed, rb.velocity.y);
 
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("Jump") && IsJumping == false)
         {
             rb.AddForce(new Vector2(rb.velocity.x, jump * 10));
-        }       
-
-
-
+            IsJumping = true;
+        }
     }
+    // leave ground, disallow jumping
+    private void OnCollisionEnter2D(Collision2D other) {
+        if(other.gameObject.CompareTag("Ground"))
+        {
+            IsJumping = false;
 
-        // Function to flip the player's sprite
+        }
+    }
+    // come back to ground, allow jumping again
+    private void OnCollisionExit2D(Collision2D other) {
+        if(other.gameObject.CompareTag("Ground"))
+        {
+            IsJumping = true;
+
+        }
+    }
+    // Function to flip the player's sprite
     public void Flip()
     {
         // Reverse the current value of the X scale of the player's sprite
@@ -45,12 +59,8 @@ public class PlayerController : MonoBehaviour
         scale.x *= -1;
         transform.localScale = scale;
     }
-
     // public bool isGrounded()
     // {
 
     // }
-
-
-
 }
